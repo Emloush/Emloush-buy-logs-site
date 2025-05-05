@@ -1,0 +1,786 @@
+!DOCTYPE html>
+html lang="en" >
+head>
+  meta charset="UTF-8" />
+  meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  title>Buy Logs - Karma Lounge Style Enhanced/title>
+  style>
+    /* Reset and base */
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f9f7f1 0%, #d5d1bc 100%);
+      color: #333;
+      max-width: 600px;
+      min-height: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      user-select: none;
+    }
+    header {
+      background: #1b1c17;
+      color: #83c441;
+      padding: 18px 20px;
+      text-align: center;
+      font-size: 1.85rem;
+      letter-spacing: 3px;
+      font-weight: 900;
+      text-transform: uppercase;
+      font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+      box-shadow: 0 4px 8px rgba(24, 26, 18, 0.7);
+      user-select: none;
+    }
+    main {
+      flex: 1;
+      overflow-y: auto;
+      padding: 12px 15px 16px;
+      position: relative;
+    }
+    h1 {
+      margin-top: 0;
+      text-align: center;
+      font-weight: 700;
+      color: #2f3a11;
+      font-size: 1.5rem;
+      user-select: text;
+      text-shadow: 1px 1px 2px #b0c05a;
+    }
+
+    /* Filter bar */
+    #filterBar {
+      margin-bottom: 12px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+      user-select: text;
+    }
+    #searchInput {
+      flex: 1 1 180px;
+      padding: 8px 12px;
+      font-size: 1rem;
+      border: 1.5px solid #83c441;
+      border-radius: 10px;
+      box-shadow: 0 1px 5px rgba(131,196,65,0.4);
+      transition: border-color 0.3s ease;
+    }
+    #searchInput:focus {
+      outline: none;
+      border-color: #172300;
+      box-shadow: 0 0 8px #a7d841;
+      background-color: #f5fde5;
+    }
+    #categorySelect {
+      flex: 0 0 140px;
+      padding: 8px 12px;
+      font-size: 1rem;
+      border-radius: 10px;
+      border: 1.5px solid #83c441;
+      background: white;
+      cursor: pointer;
+      box-shadow: 0 1px 5px rgba(131,196,65,0.4);
+      transition: border-color 0.3s ease;
+    }
+    #categorySelect:hover, #categorySelect:focus {
+      border-color: #172300;
+      box-shadow: 0 0 8px #a7d841;
+      outline: none;
+    }
+
+    #products {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      scroll-padding-top: 60px;
+    }
+    @media (max-width: 400px) {
+      #products {
+        grid-template-columns: 1fr;
+      }
+    }
+    .product-card {
+      background: white;
+      border-radius: 14px;
+      box-shadow: 0 8px 16px rgba(56, 65, 8, 0.15);
+      display: flex;
+      flex-direction: column;
+      height: 240px;
+      overflow: hidden;
+      transition: transform 0.3s cubic-bezier(.45,1.4,.89,1.12), box-shadow 0.3s ease;
+      cursor: pointer;
+      user-select: none;
+      will-change: transform, box-shadow;
+    }
+    .product-card:focus, .product-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 12px 24px rgba(56, 65, 8, 0.25);
+      outline: none;
+    }
+    .product-image {
+      flex: 1 1 130px;
+      background-position: center;
+      background-size: cover;
+      border-top-left-radius: 14px;
+      border-top-right-radius: 14px;
+      box-shadow: inset 0 0 15px rgba(0,0,0,0.13);
+    }
+    .product-info {
+      padding: 12px 14px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      user-select: text;
+    }
+    .product-name {
+      font-size: 1.1rem;
+      font-weight: 800;
+      margin: 0 0 6px 0;
+      color: #224301;
+      text-shadow: 0 0 1.2px #cee99e;
+    }
+    .product-description {
+      font-size: 0.85rem;
+      color: #65763c;
+      line-height: 1.3;
+      height: 34px;
+      overflow: hidden;
+      user-select: text;
+    }
+    .product-price {
+      margin-top: 8px;
+      font-weight: 700;
+      color: #355704;
+      font-size: 1.1rem;
+    }
+    button.buy-btn {
+      margin-top: 12px;
+      background-color: #83c441;
+      border: none;
+      color: white;
+      font-weight: 800;
+      padding: 10px 0;
+      border-radius: 9px;
+      width: 100%;
+      cursor: pointer;
+      letter-spacing: 0.7px;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      box-shadow: 0 3px 7px rgba(131,196,65,0.6);
+      user-select: none;
+    }
+    button.buy-btn:hover, button.buy-btn:focus {
+      background-color: #29520a;
+      box-shadow: 0 5px 14px rgba(56,95,0,0.9);
+      outline: none;
+    }
+    button.buy-btn:active {
+      transform: scale(0.97);
+      box-shadow: 0 2px 8px rgba(56,95,0,1);
+    }
+
+    footer {
+      background: #1b1c17;
+      color: #bbc98b;
+      text-align: center;
+      padding: 14px 12px;
+      font-size: 0.87rem;
+      font-weight: 500;
+      user-select: none;
+      box-shadow: inset 0 1px 0 #2d310b;
+      letter-spacing: 0.6px;
+    }
+
+    /* Scrollbar styling for main scrolling */
+    main::-webkit-scrollbar {
+      width: 8px;
+    }
+    main::-webkit-scrollbar-thumb {
+      background-color: #a7ce54;
+      border-radius: 5px;
+    }
+    main::-webkit-scrollbar-track {
+      background-color: #e6eed1;
+    }
+
+    /* Cart modal styles */
+    #cartModal {
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 320px;
+      max-width: 90vw;
+      height: 100vh;
+      background: #f5f9e1;
+      box-shadow: -6px 0 22px rgba(27,28,23,0.3);
+      transform: translateX(100%);
+      transition: transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      display: flex;
+      flex-direction: column;
+      z-index: 1000;
+      user-select: none;
+      border-left: 3px solid #83c441;
+    }
+    #cartModal.open {
+      transform: translateX(0);
+    }
+    #cartHeader {
+      background: #224301;
+      color: #d3e7a7;
+      font-weight: 800;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 1.2rem;
+      text-shadow: 0 0 2px #39530f;
+      user-select: none;
+      letter-spacing: 0.7px;
+    }
+    #closeCartBtn {
+      background: transparent;
+      border: none;
+      color: #d3e7a7;
+      font-size: 1.7rem;
+      cursor: pointer;
+      line-height: 1;
+      padding: 0;
+      transition: color 0.3s ease;
+      user-select: none;
+    }
+    #closeCartBtn:hover, #closeCartBtn:focus {
+      color: #a8d258;
+      outline: none;
+    }
+    #cartContent {
+      flex: 1;
+      overflow-y: auto;
+      padding: 14px 18px 10px;
+      font-size: 1rem;
+      user-select: text;
+    }
+    #cartItems {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .cartItem {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1.5px solid #d6e1b2;
+      padding: 8px 0;
+      font-size: 0.95rem;
+    }
+    .cartItemName {
+      flex: 1 0 60%;
+      font-weight: 700;
+      color: #3a4a08;
+      letter-spacing: 0.3px;
+      user-select: text;
+    }
+    .cartItemQty {
+      margin: 0 14px;
+      user-select: text;
+      font-weight: 600;
+      color: #667a1e;
+      min-width: 32px;
+      text-align: center;
+    }
+    .removeBtn {
+      background: #f05d22;
+      border: none;
+      color: white;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-size: 0.84rem;
+      cursor: pointer;
+      user-select: none;
+      font-weight: 700;
+      transition: background-color 0.2s ease;
+    }
+    .removeBtn:hover, .removeBtn:focus {
+      background: #c04200;
+      outline: none;
+    }
+    #cartTotal {
+      font-weight: 800;
+      padding-top: 14px;
+      text-align: right;
+      color: #4c6505;
+      font-size: 1.15rem;
+      letter-spacing: 0.35px;
+      user-select: text;
+    }
+    #checkoutBtn {
+      margin: 18px auto 20px;
+      padding: 12px 26px;
+      background: #83c441;
+      border: none;
+      color: #172400;
+      font-size: 1.1rem;
+      font-weight: 800;
+      border-radius: 12px;
+      cursor: pointer;
+      display: block;
+      width: calc(100% - 52px);
+      box-shadow: 0 4px 15px rgba(131,196,65,0.9);
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      user-select: none;
+    }
+    #checkoutBtn:hover, #checkoutBtn:focus {
+      background-color: #345f0e;
+      color: #c8e18c;
+      box-shadow: 0 6px 18px rgba(52,95,14,0.75);
+      outline: none;
+    }
+
+    /* Cart open button */
+    #openCartBtn {
+      position: fixed;
+      bottom: 14px;
+      right: 14px;
+      background: #83c441;
+      border: none;
+      border-radius: 50%;
+      width: 56px;
+      height: 56px;
+      color: white;
+      font-size: 2.1rem;
+      cursor: pointer;
+      box-shadow: 0 5px 10px rgba(18,57,1,0.5);
+      z-index: 1100;
+      user-select: none;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      transform-origin: center;
+    }
+    #openCartBtn:hover, #openCartBtn:focus {
+      background: #345f0e;
+      box-shadow: 0 7px 18px rgba(52,95,14,0.8);
+      outline: none;
+      transform: scale(1.06);
+    }
+
+    /* Checkout modal */
+    #checkoutModal {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      background: white;
+      border-radius: 14px;
+      width: 94vw;
+      max-width: 380px;
+      box-shadow: 0 8px 34px rgba(23, 29, 12, 0.3);
+      padding: 24px 22px 32px;
+      z-index: 1200;
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      user-select: none;
+    }
+    #checkoutModal.open {
+      transform: translate(-50%, -50%) scale(1);
+    }
+    #checkoutModal header {
+      font-size: 1.3rem;
+      font-weight: 900;
+      margin-bottom: 14px;
+      color: #4c6207;
+      user-select: text;
+      letter-spacing: 0.6px;
+      text-shadow: 0 0 3px #a6d033cc;
+    }
+    #checkoutForm label {
+      display: block;
+      font-size: 0.96rem;
+      margin-bottom: 8px;
+      margin-top: 14px;
+      user-select: text;
+      color: #667b1c;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+    }
+    #checkoutForm input[type="text"],
+    #checkoutForm input[type="email"] {
+      width: 100%;
+      padding: 10px 14px;
+      font-size: 1rem;
+      border-radius: 14px;
+      border: 1.7px solid #83c441;
+      box-sizing: border-box;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      user-select: text;
+    }
+    #checkoutForm input[type="text"]:focus,
+    #checkoutForm input[type="email"]:focus {
+      outline: none;
+      border-color: #172300;
+      box-shadow: 0 0 10px #b5ec63;
+      background-color: #f5fde5;
+    }
+    #checkoutForm button {
+      margin-top: 22px;
+      padding: 14px;
+      width: 100%;
+      background: #355704;
+      color: #d5f086;
+      font-weight: 900;
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      letter-spacing: 1.3px;
+      font-size: 1.1rem;
+      user-select: none;
+      box-shadow: 0 8px 21px #2a42103d;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    #checkoutForm button:hover, #checkoutForm button:focus {
+      background: #2f4807;
+      outline: none;
+      box-shadow: 0 8px 26px #33530e9a;
+    }
+    #closeCheckoutBtn {
+      position: absolute;
+      top: 10px;
+      right: 14px;
+      font-size: 1.7rem;
+      background: none;
+      border: none;
+      color: #4c6207;
+      cursor: pointer;
+      user-select: none;
+      padding: 0;
+      line-height: 1;
+      transition: color 0.3s ease;
+      border-radius: 50%;
+      width: 36px;
+      height: 36px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    #closeCheckoutBtn:hover, #closeCheckoutBtn:focus {
+      color: #829a33;
+      outline: none;
+      background: #cbe0817a;
+    }
+
+    /* Disable background scroll when modals open */
+    body.modal-open {
+      overflow: hidden;
+    }
+
+    /* Accessibility: focus styles on inputs and buttons */
+    input:focus, select:focus, button:focus {
+      outline-offset: 3px;
+      outline-color: #a7d841;
+      outline-style: solid;
+      outline-width: 3px;
+    }
+  /style>
+/head>
+body>
+
+header>KARMA LOUNGE LOGS/header>
+
+main>
+  h1>Choose Your Logs/h1>
+  div id="filterBar" role="search">
+    input id="searchInput" type="search" aria-label="Search logs by name" placeholder="Search logs..." />
+    select id="categorySelect" aria-label="Filter logs by category">
+      option value="all">All Categories/option>
+      option value="firewood">Firewood/option>
+      option value="timber">Timber/option>
+      option value="oak">Oak/option>
+      option value="birch">Birch/option>
+    /select>
+  /div>
+  section id="products" aria-live="polite" aria-label="Available logs for purchase">
+    !-- Product cards inserted by JavaScript -->
+  /section>
+/main>
+
+footer>
+  &copy; 2024 Karma Lounge Logs. All rights reserved.
+/footer>
+
+!-- Cart Modal -->
+aside id="cartModal" aria-label="Shopping cart" aria-hidden="true" role="dialog" aria-modal="true">
+  div id="cartHeader">
+    span>Shopping Cart/span>
+    button id="closeCartBtn" aria-label="Close cart">&times;/button>
+  /div>
+  div id="cartContent">
+    ul id="cartItems" aria-live="polite" aria-relevant="additions removals">/ul>
+    div id="cartTotal" aria-live="polite" aria-atomic="true">/div>
+    button id="checkoutBtn" aria-label="Proceed to checkout" disabled>Checkout/button>
+  /div>
+/aside>
+
+button id="openCartBtn" aria-label="Open shopping cart" title="Open Cart">&#128722;/button>
+
+!-- Checkout Modal -->
+div id="checkoutModal" aria-hidden="true" role="dialog" aria-modal="true" aria-labelledby="checkoutTitle" >
+  button id="closeCheckoutBtn" aria-label="Close checkout modal">&times;/button>
+  header id="checkoutTitle">Checkout/header>
+  form id="checkoutForm" novalidate>
+    label for="nameInput">Full Name/label>
+    input id="nameInput" name="name" type="text" autocomplete="name" required placeholder="Your full name" />
+
+    label for="emailInput">Email Address/label>
+    input id="emailInput" name="email" type="email" autocomplete="email" required placeholder="you@example.com" />
+
+    label for="addressInput">Shipping Address/label>
+    input id="addressInput" name="address" type="text" autocomplete="shipping street-address" required placeholder="Your address" />
+
+    button type="submit">Submit Order/button>
+  /form>
+/div>
+
+script>
+  const productsData = [
+    {
+      id: 'prod1',
+      name: 'Firewood Logs',
+      category: 'firewood',
+      description: 'Perfect for campfires and cozy fireplaces.',
+      price: 15,
+      unit: 'per bundle',
+      img: 'https://images.pexels.com/photos/57818/wood-hearth-fireplace-fire-57818.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=300'
+    },
+    {
+      id: 'prod2',
+      name: 'Timber Logs',
+      category: 'timber',
+      description: 'High-quality timber for construction projects.',
+      price: 50,
+      unit: 'per cubic meter',
+      img: 'https://images.pexels.com/photos/361809/pexels-photo-361809.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=300'
+    },
+    {
+      id: 'prod3',
+      name: 'Oak Logs',
+      category: 'oak',
+      description: 'Durable oak logs for woodworking and furniture.',
+      price: 70,
+      unit: 'per cubic meter',
+      img: 'https://images.pexels.com/photos/36753/wood-building-structure-timber-old.jpg?auto=compress&cs=tinysrgb&dpr=1&w=300'
+    },
+    {
+      id: 'prod4',
+      name: 'Birch Logs',
+      category: 'birch',
+      description: 'Lightweight birch logs ideal for carving.',
+      price: 40,
+      unit: 'per cubic meter',
+      img: 'https://images.pexels.com/photos/452999/pexels-photo-452999.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=300'
+    }
+  ];
+
+  const productsContainer = document.getElementById('products');
+  const searchInput = document.getElementById('searchInput');
+  const categorySelect = document.getElementById('categorySelect');
+
+  const cartModal = document.getElementById('cartModal');
+  const openCartBtn = document.getElementById('openCartBtn');
+  const closeCartBtn = document.getElementById('closeCartBtn');
+  const cartItemsList = document.getElementById('cartItems');
+  const cartTotalDisplay = document.getElementById('cartTotal');
+  const checkoutBtn = document.getElementById('checkoutBtn');
+
+  const checkoutModal = document.getElementById('checkoutModal');
+  const closeCheckoutBtn = document.getElementById('closeCheckoutBtn');
+  const checkoutForm = document.getElementById('checkoutForm');
+
+  let cart = {};
+
+  // Render product cards based on products array
+  function renderProducts(filterText = '', category = 'all') {
+    productsContainer.innerHTML = '';
+    let filtered = productsData.filter(product => {
+      const matchesText = product.name.toLowerCase().includes(filterText.toLowerCase());
+      const matchesCategory = category === 'all' || product.category === category;
+      return matchesText && matchesCategory;
+    });
+
+    if(filtered.length === 0) {
+      productsContainer.innerHTML = 'p style="grid-column: 1 / -1; text-align:center; color:#999; user-select:none;">No logs match your search/filter./p>';
+      return;
+    }
+
+    filtered.forEach(product => {
+      const card = document.createElement('article');
+      card.className = 'product-card';
+      card.setAttribute('tabindex', '0');
+      card.setAttribute('aria-label', `${product.name}, ${product.description}, Price ${product.price} dollars ${product.unit}`);
+
+      card.innerHTML = `
+        div class="product-image" style="background-image: url('${product.img}');" alt="${product.name} image">/div>
+        div class="product-info">
+          h2 class="product-name">${product.name}/h2>
+          p class="product-description">${product.description}/p>
+          p class="product-price">$${product.price} ${product.unit}/p>
+          button class="buy-btn" aria-label="Buy ${product.name}" data-id="${product.id}">Buy Now/button>
+        /div>
+      `;
+
+      productsContainer.appendChild(card);
+    });
+
+    addBuyButtonListeners();
+  }
+
+  // Add "Buy Now" button listeners
+  function addBuyButtonListeners() {
+    document.querySelectorAll('.buy-btn').forEach(button => {
+      button.onclick = () => {
+        const productId = button.dataset.id;
+        addToCart(productId);
+      };
+    });
+  }
+
+  // Add product to cart (increase quantity or add new)
+  function addToCart(productId) {
+    if(cart[productId]) {
+      cart[productId].quantity++;
+    } else {
+      const product = productsData.find(p => p.id === productId);
+      cart[productId] = {...product, quantity: 1};
+    }
+    updateCartDisplay();
+    openCart();
+  }
+
+  // Remove item from cart
+  function removeFromCart(productId) {
+    delete cart[productId];
+    updateCartDisplay();
+  }
+
+  // Calculate cart total price
+  function calculateCartTotal() {
+    return Object.values(cart).reduce((sum, item) => sum + item.price * item.quantity, 0);
+  }
+
+  // Render cart items
+  function updateCartDisplay() {
+    cartItemsList.innerHTML = '';
+
+    if(Object.keys(cart).length === 0) {
+      cartItemsList.innerHTML = 'li style="text-align:center; color:#666; user-select:none;">Your cart is empty./li>';
+      cartTotalDisplay.textContent = '';
+      checkoutBtn.disabled = true;
+      return;
+    }
+
+    Object.values(cart).forEach(item => {
+      const li = document.createElement('li');
+      li.className = 'cartItem';
+      li.innerHTML = `
+        span class="cartItemName">${item.name}/span>
+        span class="cartItemQty" aria-label="Quantity">${item.quantity}x/span>
+        button class="removeBtn" aria-label="Remove ${item.name} from cart" data-id="${item.id}">&times;/button>
+      `;
+      cartItemsList.appendChild(li);
+    });
+
+    const total = calculateCartTotal();
+    cartTotalDisplay.textContent = `Total: $${total.toFixed(2)}`;
+    checkoutBtn.disabled = false;
+
+    document.querySelectorAll('.removeBtn').forEach(btn => {
+      btn.onclick = () => {
+        removeFromCart(btn.dataset.id);
+      };
+    });
+  }
+
+  // Open cart modal
+  function openCart() {
+    cartModal.classList.add('open');
+    cartModal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('modal-open');
+    closeCheckout();
+  }
+  // Close cart modal
+  function closeCart() {
+    cartModal.classList.remove('open');
+    cartModal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+  }
+
+  openCartBtn.addEventListener('click', openCart);
+  closeCartBtn.addEventListener('click', closeCart);
+
+  // Search and category filter handling
+  searchInput.addEventListener('input', () => {
+    renderProducts(searchInput.value, categorySelect.value);
+  });
+  categorySelect.addEventListener('change', () => {
+    renderProducts(searchInput.value, categorySelect.value);
+  });
+
+  // Checkout modal controls
+  checkoutBtn.addEventListener('click', () => {
+    if(Object.keys(cart).length === 0) return;
+    openCheckout();
+  });
+  closeCheckoutBtn.addEventListener('click', closeCheckout);
+
+  // Open checkout modal
+  function openCheckout() {
+    checkoutModal.classList.add('open');
+    checkoutModal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('modal-open');
+    closeCart();
+    // Reset form
+    checkoutForm.reset();
+  }
+
+  // Close checkout modal
+  function closeCheckout() {
+    checkoutModal.classList.remove('open');
+    checkoutModal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('modal-open');
+  }
+
+  // Validate checkout form and fake submit
+  checkoutForm.addEventListener('submit', e => {
+    e.preventDefault();
+
+    if(!checkoutForm.name.value.trim() ||
+       !checkoutForm.email.value.trim() ||
+       !checkoutForm.address.value.trim()) {
+      alert('Please fill in all required fields.');
+      return;
+    }
+    if(!/\S+@\S+\.\S+/.test(checkoutForm.email.value.trim())){
+      alert('Please enter a valid email address.');
+      return;
+    }
+
+    alert(`Thank you, ${checkoutForm.name.value.trim()}!\nYour order totaling $${calculateCartTotal().toFixed(2)} has been received.\nWe will contact you at ${checkoutForm.email.value.trim()}.`);
+    cart = {};
+    updateCartDisplay();
+    closeCheckout();
+  });
+
+  renderProducts();
+
+  window.addEventListener('keydown', e => {
+    if(e.key === 'Escape') {
+      if(checkoutModal.classList.contains('open')) closeCheckout();
+      else if(cartModal.classList.contains('open')) closeCart();
+    }
+  });
+/script>
+/body>
+/html>
